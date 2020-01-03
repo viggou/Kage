@@ -94,6 +94,16 @@
 			<key>label</key>
 			<string>Respring</string>
 		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>action</key>
+			<string>openTwitter</string>
+			<key>icon</key>
+			<string>twitter.png</string>
+			<key>label</key>
+			<string>@Ra1nPix</string>
+		</dict>
 	</array>
 	<key>title</key>
 	<string>Kage</string>
