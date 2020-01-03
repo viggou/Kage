@@ -50,6 +50,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
         return %orig;
     }
 }
+%end
 // QUICK ACTIONS BG END //
 
 // GRID SWITCHER START //
