@@ -29,7 +29,7 @@
 		url = [NSURL URLWithString:@"https://mobile.twitter.com/Ra1nPix"];
 	}
 
-	[[UIApplication sharedApplication] openURL:url];
+	[[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
 -(void)saveTapped {
