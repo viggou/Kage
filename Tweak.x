@@ -17,6 +17,7 @@ static void RespringDevice() {
 static NSString *nsDomainString = @"com.yaypixxo.kage";
 static NSString *nsNotificationString = @"com.yaypixxo.kage/preferences.changed";
 
+// declare pref things here (switches, buttons, etc.)
 static BOOL enabled;
 static BOOL hideQuickActionsBG;
 static BOOL gridSwitcher;
@@ -123,6 +124,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 %end
 // SHOW TIME IN LS STATUSBAR END //
 
+// LISTENERS
 %ctor {
     // prefs changed listener
     notificationCallback(NULL, NULL, NULL, NULL, NULL);
