@@ -24,6 +24,7 @@ static BOOL gridSwitcher;
 static BOOL hideLSBatt;
 static BOOL statusBarShowTimeLS;
 static BOOL hideLabels;
+static BOOL hideFolderBadges;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSNumber *eEnabled = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
@@ -32,6 +33,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eHideLSBatt = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLSBatt" inDomain:nsDomainString];
     NSNumber *eStatusBarShowTimeLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"statusBarShowTimeLS" inDomain:nsDomainString];
     NSNumber *eHideLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLabels" inDomain:nsDomainString];
+    NSNumber *eHideFolderBadges = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBadges" inDomain:nsDomainString];
 
     enabled = (eEnabled) ? [eEnabled boolValue]:NO;
     hideQuickActionsBG = (eHideQuickActionsBG) ? [eHideQuickActionsBG boolValue]:NO;
@@ -39,13 +41,18 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     hideLSBatt = (eHideLSBatt) ? [eHideLSBatt boolValue]:NO;
     statusBarShowTimeLS = (eStatusBarShowTimeLS) ? [eStatusBarShowTimeLS boolValue]:NO;
     hideLabels = (eHideLabels) ? [eHideLabels boolValue]:NO;
+    hideFolderBadges = (eHideFolderBadges) ? [eHideFolderBadges boolValue]:NO;
 }
 
-// hooks and stuff
+// headers and hooks
 #import <UIKit/UIKit.h>
 
 @interface SBIconView : UIView
 -(void)setLabelHidden:(BOOL)hidden;
+@end
+
+@interface SBIcon : NSObject
+-(id)badgeNumberOrString;
 @end
 
 // QUICK ACTIONS BG START //
@@ -60,6 +67,19 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 %end
 // QUICK ACTIONS BG END //
+
+// HIDE BADGE TEXT START //
+%hook SBIcon
+-(id)badgeNumberOrString {
+    if (enabled && hideFolderBadges) {
+        return @"";
+    }
+    else {
+        return %orig;
+    }
+}
+%end
+// HIDE BADGE TEXT END //
 
 // HIDE LABELS START //
 %hook SBIconView
