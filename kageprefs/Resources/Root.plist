@@ -34,7 +34,7 @@
 			<key>key</key>
 			<string>hide3dDivs</string>
 			<key>label</key>
-			<string>Hide 3D Touch Dividers</string>
+			<string>Hide 3D Touch Dividers (broken)</string>
 			<key>PostNotification</key>
 			<string>com.yaypixxo.kage/preferences.changed</string>
 		</dict>
