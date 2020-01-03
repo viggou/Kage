@@ -25,6 +25,8 @@ static BOOL hideLSBatt;
 static BOOL statusBarShowTimeLS;
 static BOOL hideLabels;
 static BOOL hideFolderBadges;
+//static BOOL hideStatusBarLS;
+static BOOL hideCCGrabber;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSNumber *eEnabled = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
@@ -34,6 +36,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eStatusBarShowTimeLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"statusBarShowTimeLS" inDomain:nsDomainString];
     NSNumber *eHideLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLabels" inDomain:nsDomainString];
     NSNumber *eHideFolderBadges = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBadges" inDomain:nsDomainString];
+    //NSNumber *eHideStatusBarLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideStatusBarLS" inDomain:nsDomainString];
+    NSNumber *eHideCCGrabber = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCCGrabber" inDomain:nsDomainString];
 
     enabled = (eEnabled) ? [eEnabled boolValue]:NO;
     hideQuickActionsBG = (eHideQuickActionsBG) ? [eHideQuickActionsBG boolValue]:NO;
@@ -42,6 +46,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     statusBarShowTimeLS = (eStatusBarShowTimeLS) ? [eStatusBarShowTimeLS boolValue]:NO;
     hideLabels = (eHideLabels) ? [eHideLabels boolValue]:NO;
     hideFolderBadges = (eHideFolderBadges) ? [eHideFolderBadges boolValue]:NO;
+    //hideStatusBarLS = (eHideStatusBarLS) ? [eHideStatusBarLS boolValue]:NO;
+    hideCCGrabber = (eHideCCGrabber) ? [eHideCCGrabber boolValue]:NO;
 }
 
 // headers and hooks
@@ -54,6 +60,27 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 @interface SBIcon : NSObject
 -(id)badgeNumberOrString;
 @end
+
+@interface CSTeachableMomentsContainerView {
+
+}
+
+@property (nonatomic,retain) UIView * controlCenterGrabberView;
+@end
+
+// HIDE CC GRABBER START //
+%hook CSTeachableMomentsContainerView
+- (void)layoutSubviews {
+    if (enabled && hideCCGrabber) {
+        [self.controlCenterGrabberView setHidden:YES];
+    }
+    else {
+        [self.controlCenterGrabberView setHidden:NO];
+    }
+    return %orig;
+}
+%end
+// HIDE CC GRABBER END //
 
 // QUICK ACTIONS BG START //
 %hook UICoverSheetButton
