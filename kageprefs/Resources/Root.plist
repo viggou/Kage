@@ -32,9 +32,9 @@
 			<key>defaults</key>
 			<string>com.yaypixxo.kage</string>
 			<key>key</key>
-			<string>hide3dDivs</string>
+			<string>hideQuickActionsBG</string>
 			<key>label</key>
-			<string>Hide 3D Touch Dividers (broken)</string>
+			<string>Hide Quick Actions BG</string>
 			<key>PostNotification</key>
 			<string>com.yaypixxo.kage/preferences.changed</string>
 		</dict>

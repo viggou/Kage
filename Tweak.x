@@ -18,20 +18,20 @@ static NSString *nsDomainString = @"com.yaypixxo.kage";
 static NSString *nsNotificationString = @"com.yaypixxo.kage/preferences.changed";
 
 static BOOL enabled;
-static BOOL hide3dDivs;
+static BOOL hideQuickActionsBG;
 static BOOL gridSwitcher;
 static BOOL hideLSBatt;
 static BOOL statusBarShowTimeLS;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSNumber *eEnabled = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
-    NSNumber *eHide3dDivs = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hide3dDivs" inDomain:nsDomainString];
+    NSNumber *eHideQuickActionsBG = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideQuickActionsBG" inDomain:nsDomainString];
     NSNumber *eGridSwitcher = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"gridSwitcher" inDomain:nsDomainString];
     NSNumber *eHideLSBatt = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLSBatt" inDomain:nsDomainString];
     NSNumber *eStatusBarShowTimeLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"statusBarShowTimeLS" inDomain:nsDomainString];
 
     enabled = (eEnabled) ? [eEnabled boolValue]:NO;
-    hide3dDivs = (eHide3dDivs) ? [eHide3dDivs boolValue]:NO;
+    hideQuickActionsBG = (eHideQuickActionsBG) ? [eHideQuickActionsBG boolValue]:NO;
     gridSwitcher = (eGridSwitcher) ? [eGridSwitcher boolValue]:NO;
     hideLSBatt = (eHideLSBatt) ? [eHideLSBatt boolValue]:NO;
     statusBarShowTimeLS = (eStatusBarShowTimeLS) ? [eStatusBarShowTimeLS boolValue]:NO;
@@ -40,29 +40,17 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 // hooks and stuff
 #import <UIKit/UIKit.h>
 
-// 3D TOUCH DIVS START //
-%hook SBUIActionKeylineView
-- (void)didMoveToSuperview {
-    if (enabled && hide3dDivs) {
-
+// QUICK ACTIONS BG START //
+%hook UICoverSheetButton
+-(id)_backgroundEffectsWithBrightness:(double)arg1 {
+    if (enabled && hideQuickActionsBG) {
+        return 0;
     }
     else {
-        %orig;
+        return %orig;
     }
 }
-%end
-
-%hook _UIInterfaceActionBlankSeparatorView
-- (void)setConstantAxisDimension:(double)arg1 {
-    if (enabled && hide3dDivs) {
-
-    }
-    else {
-        %orig;
-    }
-}
-%end
-// 3D TOUCH DIVS END //
+// QUICK ACTIONS BG END //
 
 // GRID SWITCHER START //
 %hook SBAppSwitcherSettings
