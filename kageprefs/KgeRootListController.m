@@ -10,11 +10,6 @@
 	return _specifiers;
 }
 
--(void)voidView {
-	[super loadView];
-	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Respring" style:UIBarButtonItemStylePlain target:self action:@selector(saveTapped)];
-}
-
 -(void)saveTapped {
 	CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.yaypixxo.kage/respring"), NULL, NULL, YES);
 }
