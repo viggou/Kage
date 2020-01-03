@@ -23,6 +23,7 @@ static BOOL hideQuickActionsBG;
 static BOOL gridSwitcher;
 static BOOL hideLSBatt;
 static BOOL statusBarShowTimeLS;
+static BOOL hideLabels;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSNumber *eEnabled = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
@@ -30,16 +31,22 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eGridSwitcher = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"gridSwitcher" inDomain:nsDomainString];
     NSNumber *eHideLSBatt = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLSBatt" inDomain:nsDomainString];
     NSNumber *eStatusBarShowTimeLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"statusBarShowTimeLS" inDomain:nsDomainString];
+    NSNumber *eHideLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLabels" inDomain:nsDomainString];
 
     enabled = (eEnabled) ? [eEnabled boolValue]:NO;
     hideQuickActionsBG = (eHideQuickActionsBG) ? [eHideQuickActionsBG boolValue]:NO;
     gridSwitcher = (eGridSwitcher) ? [eGridSwitcher boolValue]:NO;
     hideLSBatt = (eHideLSBatt) ? [eHideLSBatt boolValue]:NO;
     statusBarShowTimeLS = (eStatusBarShowTimeLS) ? [eStatusBarShowTimeLS boolValue]:NO;
+    hideLabels = (eHideLabels) ? [eHideLabels boolValue]:NO;
 }
 
 // hooks and stuff
 #import <UIKit/UIKit.h>
+
+@interface SBIconView : UIView
+-(void)setLabelHidden:(BOOL)hidden;
+@end
 
 // QUICK ACTIONS BG START //
 %hook UICoverSheetButton
@@ -53,6 +60,17 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 %end
 // QUICK ACTIONS BG END //
+
+// HIDE LABELS START //
+%hook SBIconView
+-(void)setLabelHidden:(BOOL)hidden {
+    if (enabled && hideLabels) {
+        hidden = YES;
+    }
+    %orig;
+}
+%end
+// HIDE LABELS END //
 
 // GRID SWITCHER START //
 %hook SBAppSwitcherSettings

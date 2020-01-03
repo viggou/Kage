@@ -82,6 +82,20 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.yaypixxo.kage</string>
+			<key>key</key>
+			<string>hideLabels</string>
+			<key>label</key>
+			<string>Hide Icon Labels</string>
+			<key>PostNotification</key>
+			<string>com.yaypixxo.kage/preferences.changed</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
 			<string>* requires respring</string>
