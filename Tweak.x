@@ -71,25 +71,20 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 @property (nonatomic,retain) UIView * controlCenterGrabberView;
 @end
 
+@interface SBDashBoardTeachableMomentsContainerView {
+    
+}
+
+@property (nonatomic,retain) UIView * controlCenterGrabberView;
+@end
+
 #ifndef kCFCoreFoundationVersionNumber_iOS_13_0
 #define kCFCoreFoundationVersionNumber_iOS_13_0 1665.15
 #endif
 
 #define kSLSystemVersioniOS13 kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_13_0
 
-// HIDE CC GRABBER START //
-%hook CSTeachableMomentsContainerView
-- (void)layoutSubviews {
-    if (enabled && hideCCGrabber) {
-        [self.controlCenterGrabberView setHidden:YES];
-    }
-    else {
-        [self.controlCenterGrabberView setHidden:NO];
-    }
-    return %orig;
-}
-%end
-// HIDE CC GRABBER END //
+%group universal
 
 // QUICK ACTIONS BG START //
 %hook UICoverSheetButton
@@ -127,6 +122,65 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 %end
 // HIDE LABELS END //
+
+// GRID SWITCHER START //
+%hook SBAppSwitcherSettings
+- (void)setGridSwitcherPageScale:(double)arg1 {
+    if (enabled && gridSwitcher) {
+       arg1 = 0.4; 
+    }
+    %orig;
+}
+
+- (void)setGridSwitcherHorizontalInterpageSpacingPortrait:(double)arg1 {
+    if (enabled && gridSwitcher) {
+        arg1 = 25.5;
+    }
+    %orig;
+}
+
+- (void)setGridSwitcherHorizontalInterpageSpacingLandscape:(double)arg1 {
+    if (enabled && gridSwitcher) {
+        arg1 = 11.6;
+    }
+    %orig;
+}
+
+- (void)setGridSwitcherVerticalNaturalSpacingPortrait:(double)arg1 {
+    if (enabled && gridSwitcher) {
+        arg1 = 42;
+    }
+    %orig;
+}
+
+- (void)setGridSwitcherVerticalNaturalSpacingLandscape:(double)arg1 {
+    if (enabled && gridSwitcher) {
+        arg1 = 38;
+    }
+    %orig;
+}
+
+- (void)setSwitcherStyle:(long long)arg1 {
+    if (enabled && gridSwitcher) {
+        arg1 = 2;
+    }
+    %orig;
+}
+%end
+// GRID SWITCHER END //
+
+// NO LS BATTERY START //
+%hook CSCoverSheetViewController
+- (void)_transitionChargingViewToVisible:(bool)arg1 showBattery:(bool)arg2 animated:(bool)arg3 {
+    if (enabled && hideLSBatt) {
+        arg1 = 0;
+    }
+    %orig;
+}
+%end
+// NO LS BATTERY END //
+
+%end // end universal group
 
 // stuff that only works on iOS 13
 %group ios13
@@ -218,65 +272,9 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 
 %end // end ios12 group
 
-// GRID SWITCHER START //
-%hook SBAppSwitcherSettings
-- (void)setGridSwitcherPageScale:(double)arg1 {
-    if (enabled && gridSwitcher) {
-       arg1 = 0.4; 
-    }
-    %orig;
-}
-
-- (void)setGridSwitcherHorizontalInterpageSpacingPortrait:(double)arg1 {
-    if (enabled && gridSwitcher) {
-        arg1 = 25.5;
-    }
-    %orig;
-}
-
-- (void)setGridSwitcherHorizontalInterpageSpacingLandscape:(double)arg1 {
-    if (enabled && gridSwitcher) {
-        arg1 = 11.6;
-    }
-    %orig;
-}
-
-- (void)setGridSwitcherVerticalNaturalSpacingPortrait:(double)arg1 {
-    if (enabled && gridSwitcher) {
-        arg1 = 42;
-    }
-    %orig;
-}
-
-- (void)setGridSwitcherVerticalNaturalSpacingLandscape:(double)arg1 {
-    if (enabled && gridSwitcher) {
-        arg1 = 38;
-    }
-    %orig;
-}
-
-- (void)setSwitcherStyle:(long long)arg1 {
-    if (enabled && gridSwitcher) {
-        arg1 = 2;
-    }
-    %orig;
-}
-%end
-// GRID SWITCHER END //
-
-// NO LS BATTERY START //
-%hook CSCoverSheetViewController
-- (void)_transitionChargingViewToVisible:(bool)arg1 showBattery:(bool)arg2 animated:(bool)arg3 {
-    if (enabled && hideLSBatt) {
-        arg1 = 0;
-    }
-    %orig;
-}
-%end
-// NO LS BATTERY END //
-
 // LISTENERS
 %ctor {
+    %init(universal);
     // check iOS version
     if (kSLSystemVersioniOS13) {
         %init(ios13);

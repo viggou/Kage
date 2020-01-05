@@ -34,7 +34,7 @@
 			<key>key</key>
 			<string>hideQuickActionsBG</string>
 			<key>label</key>
-			<string>Hide Quick Actions BG*</string>
+			<string>Hide Quick Actions BG (iPhone X)*</string>
 			<key>PostNotification</key>
 			<string>com.yaypixxo.kage/preferences.changed</string>
 		</dict>
@@ -76,7 +76,7 @@
 			<key>key</key>
 			<string>statusBarShowTimeLS</string>
 			<key>label</key>
-			<string>Time in LS Status Bar</string>
+			<string>Time in LS Status Bar (iPhone X)</string>
 			<key>PostNotification</key>
 			<string>com.yaypixxo.kage/preferences.changed</string>
 		</dict>
