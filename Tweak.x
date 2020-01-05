@@ -30,6 +30,7 @@ static BOOL hideFolderTitle;
 static BOOL hideFolderBG;
 static BOOL hideFolderBGSB;
 static BOOL hideFolderDots;
+static BOOL hideNoOlderNotifs;
 //static BOOL hideStatusBarLS;
 static BOOL hideCCGrabber;
 
@@ -46,6 +47,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eHideFolderBG = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBG" inDomain:nsDomainString];
     NSNumber *eHideFolderBGSB = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBGSB" inDomain:nsDomainString];
     NSNumber *eHideFolderDots = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderDots" inDomain:nsDomainString];
+    NSNumber *eHideNoOlderNotifs = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideNoOlderNotifs" inDomain:nsDomainString];
     //NSNumber *eHideStatusBarLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideStatusBarLS" inDomain:nsDomainString];
     NSNumber *eHideCCGrabber = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCCGrabber" inDomain:nsDomainString];
 
@@ -61,6 +63,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     hideFolderBG = (eHideFolderBG) ? [eHideFolderBG boolValue]:NO;
     hideFolderBGSB = (eHideFolderBGSB) ? [eHideFolderBGSB boolValue]:NO;
     hideFolderDots = (eHideFolderDots) ? [eHideFolderDots boolValue]:NO;
+    hideNoOlderNotifs = (eHideNoOlderNotifs) ? [eHideNoOlderNotifs boolValue]:NO;
     //hideStatusBarLS = (eHideStatusBarLS) ? [eHideStatusBarLS boolValue]:NO;
     hideCCGrabber = (eHideCCGrabber) ? [eHideCCGrabber boolValue]:NO;
 }
@@ -100,6 +103,14 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 -(void)_closeFolderController:(id)arg1 animated:(BOOL)arg2 withCompletion:(id)arg3;
 @end
 
+@interface SBUILegibilityLabel : UIView
+@property (nonatomic,copy) NSString *string;
+@end
+
+@interface NCNotificationListSectionRevealHintView : UIView 
+@property (nonatomic,retain)SBUILegibilityLabel *revealHintTitle;
+@end
+
 /*@interface SBFloatyFolderView : SBFolderView
 -(void)_handleOutsideTap:(id)arg1 ;
 @end
@@ -120,6 +131,19 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 #define kSLSystemVersioniOS13 kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_13_0
 
 %group universal
+
+// HIDE NO OLDER NOTIFICATIONS START //
+%hook NCNotificationListSectionRevealHintView
+
+-(void)didMoveToWindow {
+    %orig;
+    if (enabled && hideNoOlderNotifs) {
+        self.revealHintTitle.string = @"";
+    }
+}
+
+%end
+// HIDE NO OLDER NOTIFICATIONS END //
 
 // QUICK ACTIONS BG START //
 %hook UICoverSheetButton

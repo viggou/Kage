@@ -178,6 +178,20 @@
 			<key>PostNotification</key>
 			<string>com.yaypixxo.kage/preferences.changed</string>
 		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.yaypixxo.kage</string>
+			<key>key</key>
+			<string>hideNoOlderNotifs</string>
+			<key>label</key>
+			<string>Hide "No Older Notifications"</string>
+			<key>PostNotification</key>
+			<string>com.yaypixxo.kage/preferences.changed</string>
+		</dict>
 		<!--<dict>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
