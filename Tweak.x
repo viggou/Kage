@@ -27,7 +27,9 @@ static BOOL hideLabels;
 static BOOL hideCarPlayLabels;
 static BOOL hideFolderBadges;
 static BOOL hideFolderTitle;
-//static BOOL hideFolderBG;
+static BOOL hideFolderBG;
+static BOOL hideFolderBGSB;
+static BOOL hideFolderDots;
 //static BOOL hideStatusBarLS;
 static BOOL hideCCGrabber;
 
@@ -41,7 +43,9 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eHideCarPlayLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCarPlayLabels" inDomain:nsDomainString];
     NSNumber *eHideFolderBadges = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBadges" inDomain:nsDomainString];
     NSNumber *eHideFolderTitle = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderTitle" inDomain:nsDomainString];
-    //NSNumber *eHideFolderBG = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBG" inDomain:nsDomainString];
+    NSNumber *eHideFolderBG = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBG" inDomain:nsDomainString];
+    NSNumber *eHideFolderBGSB = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBGSB" inDomain:nsDomainString];
+    NSNumber *eHideFolderDots = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderDots" inDomain:nsDomainString];
     //NSNumber *eHideStatusBarLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideStatusBarLS" inDomain:nsDomainString];
     NSNumber *eHideCCGrabber = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCCGrabber" inDomain:nsDomainString];
 
@@ -54,13 +58,18 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     hideCarPlayLabels = (eHideCarPlayLabels) ? [eHideCarPlayLabels boolValue]:NO;
     hideFolderBadges = (eHideFolderBadges) ? [eHideFolderBadges boolValue]:NO;
     hideFolderTitle = (eHideFolderTitle) ? [eHideFolderTitle boolValue]:NO;
-    //hideFolderBG = (eHideFolderBG) ? [eHideFolderBG boolValue]:NO;
+    hideFolderBG = (eHideFolderBG) ? [eHideFolderBG boolValue]:NO;
+    hideFolderBGSB = (eHideFolderBGSB) ? [eHideFolderBGSB boolValue]:NO;
+    hideFolderDots = (eHideFolderDots) ? [eHideFolderDots boolValue]:NO;
     //hideStatusBarLS = (eHideStatusBarLS) ? [eHideStatusBarLS boolValue]:NO;
     hideCCGrabber = (eHideCCGrabber) ? [eHideCCGrabber boolValue]:NO;
 }
 
 // headers and hooks
 #import <UIKit/UIKit.h>
+
+/*@interface SBFolderView : UIView
+@end*/
 
 @interface SBIconView : UIView
 -(void)setLabelHidden:(BOOL)hidden;
@@ -77,6 +86,32 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 @interface SBDashBoardTeachableMomentsContainerView
 @property (nonatomic,retain) UIView * controlCenterGrabberView;
 @end
+
+@interface SBFolderIconImageView : UIView 
+@property (nonatomic, retain) UIView *backgroundView;
+@end
+
+@interface SBIconListPageControl
+@property (nonatomic, assign, readwrite, getter=isHidden) BOOL hidden;
+@end
+
+@interface SBIconController : NSObject
++(id)sharedInstance;
+-(void)_closeFolderController:(id)arg1 animated:(BOOL)arg2 withCompletion:(id)arg3;
+@end
+
+/*@interface SBFloatyFolderView : SBFolderView
+-(void)_handleOutsideTap:(id)arg1 ;
+@end
+
+@interface SBFolderController : UIViewController
+@property (nonatomic,readonly) UIView * containerView;
+@end
+
+@interface SBFloatyFolderScrollView : UIScrollView
+-(void)closeFolder:(id)selector;
+-(id)_viewControllerForAncestor;
+@end*/
 
 #ifndef kCFCoreFoundationVersionNumber_iOS_13_0
 #define kCFCoreFoundationVersionNumber_iOS_13_0 1665.15
@@ -194,16 +229,72 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 // SHOW FOLDER TITLE END //
 
 // HIDE FOLDER BACKGROUND START //
-/*%hook SBFolderBackgroundView
-    -(void)layoutSubviews {
+%hook SBFloatyFolderView
+-(void)setBackgroundAlpha:(CGFloat)arg1 {
+    if (enabled && hideFolderBG) {
+        %orig(0.0);
+    }
+    else {
         %orig;
-        if (enabled && hideFolderBG) {
-            UIImageView * tintView = MSHookIvar<UIImageView *>(self, "_tintView");
-            tintView.alpha = 0;
+    }
+}
+%end
+
+%hook SBFolderIconImageView
+-(void)layoutSubviews {
+    %orig;
+    if (enabled && hideFolderBGSB) {
+        self.backgroundView.alpha = 0;
+        self.backgroundView.hidden = 1;
+    }
+}
+%end
+
+// Close folder when tapped inside
+/*%hook SBFloatyFolderScrollView
+-(SBFloatyFolderScrollView *)initWithFrame:(CGRect)frame {
+    if (enabled && hideFolderBG) {
+        SBFloatyFolderScrollView *yeet = %orig;
+
+        UITapGestureRecognizer *closeGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeFolder)];
+
+        [yeet addGestureRecognizer:closeGesture];
+
+        return yeet;
+    }
+    else {
+        return %orig;
+    }
+}
+
+%new
+-(void)closeFolder:(id)sender {
+    UIViewController *parentController = [self _viewControllerForAncestor];
+
+    if ([parentController isKindOfClass:[objc_getClass("SBFolderController") class]]) {
+        SBFolderController *sbfc = (SBFolderController *)parentController;
+
+        if (sbfc && [sbfc.containerView isKindOfClass:[objc_getClass("SBFloatyFolderView") class]]) {
+            [(SBFloatyFolderView *)sbfc.containerView _handleOutsideTap:nil];
         }
     }
+}
 %end*/
+
 // HIDE FOLDER BACKGROUND END //
+
+// HIDE FOLDER DOTS START //
+%hook SBIconListPageControl
+-(void)layoutSubviews {
+    if (enabled && hideFolderDots) {
+        self.hidden = YES;
+    }
+    else {
+        %orig;
+    }
+}
+%end
+// HIDE FOLDER DOTS END //
 
 %end // end universal group
 
