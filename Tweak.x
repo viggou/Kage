@@ -111,6 +111,9 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 @property (nonatomic,retain)SBUILegibilityLabel *revealHintTitle;
 @end
 
+@interface SBIconListPageControl : UIView
+@end
+
 /*@interface SBFloatyFolderView : SBFolderView
 -(void)_handleOutsideTap:(id)arg1 ;
 @end

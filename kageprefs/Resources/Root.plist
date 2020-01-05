@@ -174,7 +174,7 @@
 			<key>key</key>
 			<string>hideFolderDots</string>
 			<key>label</key>
-			<string>Hide Folder Page Dots</string>
+			<string>Hide Page Dots*</string>
 			<key>PostNotification</key>
 			<string>com.yaypixxo.kage/preferences.changed</string>
 		</dict>
