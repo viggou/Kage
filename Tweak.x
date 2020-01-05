@@ -26,6 +26,8 @@ static BOOL statusBarShowTimeLS;
 static BOOL hideLabels;
 static BOOL hideCarPlayLabels;
 static BOOL hideFolderBadges;
+static BOOL hideFolderTitle;
+static BOOL hideFolderBG;
 //static BOOL hideStatusBarLS;
 static BOOL hideCCGrabber;
 
@@ -38,6 +40,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eHideLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLabels" inDomain:nsDomainString];
     NSNumber *eHideCarPlayLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCarPlayLabels" inDomain:nsDomainString];
     NSNumber *eHideFolderBadges = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBadges" inDomain:nsDomainString];
+    NSNumber *eHideFolderTitle = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderTitle" inDomain:nsDomainString];
+    NSNumber *eHideFolderBG = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBG" inDomain:nsDomainString];
     //NSNumber *eHideStatusBarLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideStatusBarLS" inDomain:nsDomainString];
     NSNumber *eHideCCGrabber = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCCGrabber" inDomain:nsDomainString];
 
@@ -49,6 +53,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     hideLabels = (eHideLabels) ? [eHideLabels boolValue]:NO;
     hideCarPlayLabels = (eHideCarPlayLabels) ? [eHideCarPlayLabels boolValue]:NO;
     hideFolderBadges = (eHideFolderBadges) ? [eHideFolderBadges boolValue]:NO;
+    hideFolderTitle = (eHideFolderTitle) ? [eHideFolderTitle boolValue]:NO;
+    hideFolderBG = (eHideFolderBG) ? [eHideFolderBG boolValue]:NO;
     //hideStatusBarLS = (eHideStatusBarLS) ? [eHideStatusBarLS boolValue]:NO;
     hideCCGrabber = (eHideCCGrabber) ? [eHideCCGrabber boolValue]:NO;
 }
@@ -179,6 +185,31 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 %end
 // NO LS BATTERY END //
+
+// SHOW FOLDER TITLE START //
+%hook SBFloatyFolderView
+-(BOOL)_showsTitle {
+    if (enabled && hideFolderTitle) {
+        return NO;
+    }
+    else {
+        return %orig;
+    }
+}
+%end
+// SHOW FOLDER TITLE END //
+
+// HIDE FOLDER BACKGROUND START //
+%hook SBFolderBackgroundView
+    -(void)layoutSubviews {
+        %orig;
+        if (enabled && hideFolderBG) {
+            UIImageView * tintView = MSHookIvar<UIImageView *>(self, "_tintView");
+            tintView.alpha = 0; 
+        }
+    }
+%end
+// HIDE FOLDER BACKGROUND END //
 
 %end // end universal group
 
