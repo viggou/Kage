@@ -1,7 +1,7 @@
 Package: com.yaypixxo.kage
 Name: Kage
 Depends: mobilesubstrate, preferenceloader
-Version: 1.1.1
+Version: 1.1.2
 Architecture: iphoneos-arm
 Description: show/hide/change ls and hs stuff!
 Icon: https://yaypixxo.com/assets/com.yaypixxo.kage.png
