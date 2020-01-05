@@ -24,6 +24,7 @@ static BOOL gridSwitcher;
 static BOOL hideLSBatt;
 static BOOL statusBarShowTimeLS;
 static BOOL hideLabels;
+static BOOL hideCarPlayLabels;
 static BOOL hideFolderBadges;
 //static BOOL hideStatusBarLS;
 static BOOL hideCCGrabber;
@@ -35,6 +36,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eHideLSBatt = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLSBatt" inDomain:nsDomainString];
     NSNumber *eStatusBarShowTimeLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"statusBarShowTimeLS" inDomain:nsDomainString];
     NSNumber *eHideLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLabels" inDomain:nsDomainString];
+    NSNumber *eHideCarPlayLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCarPlayLabels" inDomain:nsDomainString];
     NSNumber *eHideFolderBadges = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBadges" inDomain:nsDomainString];
     //NSNumber *eHideStatusBarLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideStatusBarLS" inDomain:nsDomainString];
     NSNumber *eHideCCGrabber = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCCGrabber" inDomain:nsDomainString];
@@ -45,6 +47,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     hideLSBatt = (eHideLSBatt) ? [eHideLSBatt boolValue]:NO;
     statusBarShowTimeLS = (eStatusBarShowTimeLS) ? [eStatusBarShowTimeLS boolValue]:NO;
     hideLabels = (eHideLabels) ? [eHideLabels boolValue]:NO;
+    hideCarPlayLabels = (eHideCarPlayLabels) ? [eHideCarPlayLabels boolValue]:NO;
     hideFolderBadges = (eHideFolderBadges) ? [eHideFolderBadges boolValue]:NO;
     //hideStatusBarLS = (eHideStatusBarLS) ? [eHideStatusBarLS boolValue]:NO;
     hideCCGrabber = (eHideCCGrabber) ? [eHideCCGrabber boolValue]:NO;
@@ -67,6 +70,12 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 
 @property (nonatomic,retain) UIView * controlCenterGrabberView;
 @end
+
+#ifndef kCFCoreFoundationVersionNumber_iOS_13_0
+#define kCFCoreFoundationVersionNumber_iOS_13_0 1665.15
+#endif
+
+#define kSLSystemVersioniOS13 kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_13_0
 
 // HIDE CC GRABBER START //
 %hook CSTeachableMomentsContainerView
@@ -95,7 +104,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 %end
 // QUICK ACTIONS BG END //
 
-// HIDE BADGE TEXT START //
+// HIDE FOLDER BADGE TEXT START //
 %hook SBIcon
 -(id)badgeNumberOrString {
     if (enabled && hideFolderBadges) {
@@ -106,7 +115,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// HIDE BADGE TEXT END //
+// HIDE FOLDER BADGE TEXT END //
 
 // HIDE LABELS START //
 %hook SBIconView
@@ -118,6 +127,96 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 %end
 // HIDE LABELS END //
+
+// stuff that only works on iOS 13
+%group ios13
+
+// SHOW TIME IN LS STATUSBAR START //
+%hook CSCoverSheetViewController
+- (bool)shouldShowLockStatusBarTime {
+    if (enabled && statusBarShowTimeLS) {
+        return YES;
+    }
+    else {
+        return %orig;
+    }
+}
+%end
+// SHOW TIME IN LS STATUSBAR END //
+
+// HIDE CC GRABBER START //
+%hook CSTeachableMomentsContainerView
+- (void)layoutSubviews {
+    if (enabled && hideCCGrabber) {
+        [self.controlCenterGrabberView setHidden:YES];
+    }
+    else {
+        [self.controlCenterGrabberView setHidden:NO];
+    }
+    return %orig;
+}
+%end
+// HIDE CC GRABBER END //
+
+// HIDE CARPLAY LABELS START //
+%hook CARIconView
++(CGSize)maxLabelSizeForIconImageSize:(CGSize)imageSize {
+    if (enabled && hideCarPlayLabels) {
+        return CGSizeZero;
+    }
+    else {
+        return %orig;
+    }
+}
+%end
+// HIDE CARPLAY LABELS END //
+
+%end // end ios13 group
+
+// stuff that only works on iOS 12
+%group ios12
+
+// SHOW TIME IN LS STATUSBAR START //
+%hook SBLockScreenViewControllerBase
+- (bool)shouldShowLockStatusBarTime {
+    if (enabled && statusBarShowTimeLS) {
+        return YES;
+    }
+    else {
+        return %orig;
+    }
+}
+%end
+// SHOW TIME IN LS STATUSBAR END //
+
+// HIDE CC GRABBER START //
+%hook SBDashBoardTeachableMomentsContainerView
+- (void)layoutSubviews {
+    if (enabled && hideCCGrabber) {
+        [self.controlCenterGrabberView setHidden:YES];
+    }
+    else {
+        [self.controlCenterGrabberView setHidden:NO];
+    }
+    return %orig;
+}
+%end
+// HIDE CC GRABBER END //
+
+// HIDE CARPLAY LABELS START //
+%hook SBStarkIconView
++(CGSize)maxLabelSize {
+    if (enabled && hideCarPlayLabels) {
+        return CGSizeZero;
+    }
+    else {
+        return %orig;
+    }
+}
+%end
+// HIDE CARPLAY LABELS END //
+
+%end // end ios12 group
 
 // GRID SWITCHER START //
 %hook SBAppSwitcherSettings
@@ -176,21 +275,16 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 %end
 // NO LS BATTERY END //
 
-// SHOW TIME IN LS STATUSBAR START //
-%hook CSCoverSheetViewController
-- (bool)shouldShowLockStatusBarTime {
-    if (enabled && statusBarShowTimeLS) {
-        return 1;
-    }
-    else {
-        return %orig;
-    }
-}
-%end
-// SHOW TIME IN LS STATUSBAR END //
-
 // LISTENERS
 %ctor {
+    // check iOS version
+    if (kSLSystemVersioniOS13) {
+        %init(ios13);
+    }
+    else {
+        %init(ios12);
+    }
+
     // prefs changed listener
     notificationCallback(NULL, NULL, NULL, NULL, NULL);
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, notificationCallback, (CFStringRef)nsNotificationString, NULL, CFNotificationSuspensionBehaviorCoalesce);
