@@ -24,7 +24,7 @@ static BOOL gridSwitcher;
 static BOOL hideLSBatt;
 static BOOL statusBarShowTimeLS;
 static BOOL hideLabels;
-static BOOL hideCarPlayLabels;
+//static BOOL hideCarPlayLabels;
 static BOOL hideFolderBadges;
 static BOOL hideFolderTitle;
 static BOOL hideFolderBG;
@@ -41,7 +41,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eHideLSBatt = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLSBatt" inDomain:nsDomainString];
     NSNumber *eStatusBarShowTimeLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"statusBarShowTimeLS" inDomain:nsDomainString];
     NSNumber *eHideLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideLabels" inDomain:nsDomainString];
-    NSNumber *eHideCarPlayLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCarPlayLabels" inDomain:nsDomainString];
+    //NSNumber *eHideCarPlayLabels = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCarPlayLabels" inDomain:nsDomainString];
     NSNumber *eHideFolderBadges = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBadges" inDomain:nsDomainString];
     NSNumber *eHideFolderTitle = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderTitle" inDomain:nsDomainString];
     NSNumber *eHideFolderBG = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideFolderBG" inDomain:nsDomainString];
@@ -57,7 +57,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     hideLSBatt = (eHideLSBatt) ? [eHideLSBatt boolValue]:NO;
     statusBarShowTimeLS = (eStatusBarShowTimeLS) ? [eStatusBarShowTimeLS boolValue]:NO;
     hideLabels = (eHideLabels) ? [eHideLabels boolValue]:NO;
-    hideCarPlayLabels = (eHideCarPlayLabels) ? [eHideCarPlayLabels boolValue]:NO;
+    //hideCarPlayLabels = (eHideCarPlayLabels) ? [eHideCarPlayLabels boolValue]:NO;
     hideFolderBadges = (eHideFolderBadges) ? [eHideFolderBadges boolValue]:NO;
     hideFolderTitle = (eHideFolderTitle) ? [eHideFolderTitle boolValue]:NO;
     hideFolderBG = (eHideFolderBG) ? [eHideFolderBG boolValue]:NO;
@@ -145,7 +145,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 %end
 // HIDE NO OLDER NOTIFICATIONS END //
 
-// QUICK ACTIONS BG START //
+// HIDE QUICK ACTIONS BG START //
 %hook UICoverSheetButton
 -(id)_backgroundEffectsWithBrightness:(double)arg1 {
     if (enabled && hideQuickActionsBG) {
@@ -156,7 +156,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// QUICK ACTIONS BG END //
+// HIDE QUICK ACTIONS BG END //
 
 // HIDE FOLDER BADGE TEXT START //
 %hook SBIcon
@@ -353,7 +353,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 // HIDE CC GRABBER END //
 
 // HIDE CARPLAY LABELS START //
-%hook CARIconView
+/*%hook CARIconView
 +(CGSize)maxLabelSizeForIconImageSize:(CGSize)imageSize {
     if (enabled && hideCarPlayLabels) {
         return CGSizeZero;
@@ -362,7 +362,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
         return %orig;
     }
 }
-%end
+%end*/
 // HIDE CARPLAY LABELS END //
 
 %end // end ios13 group
@@ -398,7 +398,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 // HIDE CC GRABBER END //
 
 // HIDE CARPLAY LABELS START //
-%hook SBStarkIconView
+/*%hook SBStarkIconView
 +(CGSize)maxLabelSize {
     if (enabled && hideCarPlayLabels) {
         return CGSizeZero;
@@ -407,7 +407,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
         return %orig;
     }
 }
-%end
+%end*/
 // HIDE CARPLAY LABELS END //
 
 %end // end ios12 group
