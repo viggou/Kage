@@ -222,6 +222,20 @@
 		</dict>
 		<dict>
 			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.yaypixxo.kage</string>
+			<key>key</key>
+			<string>noBetaAlert</string>
+			<key>label</key>
+			<string>No Beta iOS Alert</string>
+			<key>PostNotification</key>
+			<string>com.yaypixxo.kage/preferences.changed</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
 			<string>Kage - By YaYPIXXO</string>

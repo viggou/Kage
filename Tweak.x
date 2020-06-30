@@ -1,4 +1,4 @@
-// respring function
+// Respring function
 @interface FBSystemService : NSObject
 +(id)sharedInstance;
 -(void)exitAndRelaunch:(bool)arg1;
@@ -8,7 +8,7 @@ static void RespringDevice() {
     [[%c(FBSystemService) sharedInstance] exitAndRelaunch:YES];
 }
 
-// prefs
+// Prefs
 @interface NSUserDefaults (KagePrefs)
 -(id)objectForKey:(NSString *)key inDomain:(NSString *)domain;
 -(void)setObject:(id)value forKey:(NSString *)key inDomain:(NSString *)domain;
@@ -17,7 +17,7 @@ static void RespringDevice() {
 static NSString *nsDomainString = @"com.yaypixxo.kage";
 static NSString *nsNotificationString = @"com.yaypixxo.kage/preferences.changed";
 
-// declare pref things here (switches, buttons, etc.)
+// Declare pref things here (switches, buttons, etc.)
 static BOOL enabled;
 static BOOL hideQuickActionsBG;
 static BOOL gridSwitcher;
@@ -33,6 +33,7 @@ static BOOL hideFolderDots;
 static BOOL hideNoOlderNotifs;
 //static BOOL hideStatusBarLS;
 static BOOL hideCCGrabber;
+static BOOL noBetaAlert;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSNumber *eEnabled = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
@@ -50,6 +51,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber *eHideNoOlderNotifs = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideNoOlderNotifs" inDomain:nsDomainString];
     //NSNumber *eHideStatusBarLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideStatusBarLS" inDomain:nsDomainString];
     NSNumber *eHideCCGrabber = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCCGrabber" inDomain:nsDomainString];
+    NSNumber *eNoBetaAlert = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"noBetaAlert" inDomain:nsDomainString];
 
     enabled = (eEnabled) ? [eEnabled boolValue]:NO;
     hideQuickActionsBG = (eHideQuickActionsBG) ? [eHideQuickActionsBG boolValue]:NO;
@@ -66,9 +68,10 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     hideNoOlderNotifs = (eHideNoOlderNotifs) ? [eHideNoOlderNotifs boolValue]:NO;
     //hideStatusBarLS = (eHideStatusBarLS) ? [eHideStatusBarLS boolValue]:NO;
     hideCCGrabber = (eHideCCGrabber) ? [eHideCCGrabber boolValue]:NO;
+    noBetaAlert = (eNoBetaAlert) ? [eNoBetaAlert boolValue]:NO;
 }
 
-// headers and hooks
+// Headers 
 #import <UIKit/UIKit.h>
 
 /*@interface SBFolderView : UIView
@@ -130,9 +133,9 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 
 #define kSLSystemVersioniOS13 kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iOS_13_0
 
-%group universal
+%group universal // Stuff that works on both iOS 12 & iOS 13 (and some things 9+)
 
-// HIDE NO OLDER NOTIFICATIONS START //
+// Hide no older notifications
 %hook NCNotificationListSectionRevealHintView
 
 -(void)didMoveToWindow {
@@ -143,9 +146,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 
 %end
-// HIDE NO OLDER NOTIFICATIONS END //
 
-// HIDE QUICK ACTIONS BG START //
+// Hide quick actions BG
 %hook UICoverSheetButton
 -(id)_backgroundEffectsWithBrightness:(double)arg1 {
     if (enabled && hideQuickActionsBG) {
@@ -156,9 +158,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// HIDE QUICK ACTIONS BG END //
 
-// HIDE FOLDER BADGE TEXT START //
+// Hide folder badges text
 %hook SBIcon
 -(id)badgeNumberOrString {
     if (enabled && hideFolderBadges) {
@@ -169,9 +170,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// HIDE FOLDER BADGE TEXT END //
 
-// HIDE LABELS START //
+// Hide icon labels
 %hook SBIconView
 -(void)setLabelHidden:(BOOL)hidden {
     if (enabled && hideLabels) {
@@ -180,9 +180,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     %orig;
 }
 %end
-// HIDE LABELS END //
 
-// GRID SWITCHER START //
+// Grid switcher
 %hook SBAppSwitcherSettings
 - (void)setGridSwitcherPageScale:(double)arg1 {
     if (enabled && gridSwitcher) {
@@ -226,9 +225,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     %orig;
 }
 %end
-// GRID SWITCHER END //
 
-// NO LS BATTERY START //
+// Hide LS battery
 %hook CSCoverSheetViewController
 - (void)_transitionChargingViewToVisible:(bool)arg1 showBattery:(bool)arg2 animated:(bool)arg3 {
     if (enabled && hideLSBatt) {
@@ -237,9 +235,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     %orig;
 }
 %end
-// NO LS BATTERY END //
 
-// SHOW FOLDER TITLE START //
+// Hide folder title
 %hook SBFloatyFolderView
 -(BOOL)_showsTitle {
     if (enabled && hideFolderTitle) {
@@ -250,9 +247,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// SHOW FOLDER TITLE END //
 
-// HIDE FOLDER BACKGROUND START //
+// Hide folder backgrounds
 %hook SBFloatyFolderView
 -(void)setBackgroundAlpha:(CGFloat)arg1 {
     if (enabled && hideFolderBG) {
@@ -305,9 +301,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 }
 %end*/
 
-// HIDE FOLDER BACKGROUND END //
-
-// HIDE FOLDER DOTS START //
+// Hide folder dots
 %hook SBIconListPageControl
 -(void)layoutSubviews {
     if (enabled && hideFolderDots) {
@@ -318,14 +312,39 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// HIDE FOLDER DOTS END //
 
-%end // end universal group
+// Hide beta alert
 
-// stuff that only works on iOS 13
+// iOS 9-10
+%hook SBIconController
+-(void)showDeveloperBuildExpirationAlertIfNecesarryFromLockscreen:(BOOL)arg1 toLauncher:(BOOL)arg2 {
+	if (enabled && noBetaAlert) {
+
+	}
+	else {
+		%orig;
+	}
+}
+%end
+
+// iOS 11-13
+%hook SBDeveloperBuildExpirationTrigger
+-(void)showDeveloperBuildExpirationAlertIfNecesarryFromLockscreen:(BOOL)arg1 toLauncher:(BOOL)arg2 {
+	if (enabled && noBetaAlert) {
+
+	}
+	else {
+		%orig;
+	}
+}
+%end
+
+%end // End universal group
+
+// Stuff that only works on iOS 13
 %group ios13
 
-// SHOW TIME IN LS STATUSBAR START //
+// Show time in LS statusbar 
 %hook CSCoverSheetViewController
 - (bool)shouldShowLockStatusBarTime {
     if (enabled && statusBarShowTimeLS) {
@@ -336,9 +355,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// SHOW TIME IN LS STATUSBAR END //
 
-// HIDE CC GRABBER START //
+// Hide CC LS grabber 
 %hook CSTeachableMomentsContainerView
 - (void)layoutSubviews {
     if (enabled && hideCCGrabber) {
@@ -350,9 +368,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     return %orig;
 }
 %end
-// HIDE CC GRABBER END //
 
-// HIDE CARPLAY LABELS START //
+// Hide CarPlay labels 
 /*%hook CARIconView
 +(CGSize)maxLabelSizeForIconImageSize:(CGSize)imageSize {
     if (enabled && hideCarPlayLabels) {
@@ -363,14 +380,13 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end*/
-// HIDE CARPLAY LABELS END //
 
-%end // end ios13 group
+%end // End ios13 group
 
-// stuff that only works on iOS 12
+// Stuff that only works on iOS 12
 %group ios12
 
-// SHOW TIME IN LS STATUSBAR START //
+// Show time in LS statusbar
 %hook SBLockScreenViewControllerBase
 - (bool)shouldShowLockStatusBarTime {
     if (enabled && statusBarShowTimeLS) {
@@ -381,9 +397,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end
-// SHOW TIME IN LS STATUSBAR END //
 
-// HIDE CC GRABBER START //
+// Hide CC LS grabber
 %hook SBDashBoardTeachableMomentsContainerView
 - (void)layoutSubviews {
     if (enabled && hideCCGrabber) {
@@ -395,9 +410,8 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     return %orig;
 }
 %end
-// HIDE CC GRABBER END //
 
-// HIDE CARPLAY LABELS START //
+// Hide CarPlay labels
 /*%hook SBStarkIconView
 +(CGSize)maxLabelSize {
     if (enabled && hideCarPlayLabels) {
@@ -408,14 +422,13 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     }
 }
 %end*/
-// HIDE CARPLAY LABELS END //
 
-%end // end ios12 group
+%end // End ios12 group
 
-// LISTENERS
+// Listeners
 %ctor {
     %init(universal);
-    // check iOS version
+    // Check iOS version
     if (kSLSystemVersioniOS13) {
         %init(ios13);
     }
@@ -423,10 +436,10 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
         %init(ios12);
     }
 
-    // prefs changed listener
+    // Prefs changed listener
     notificationCallback(NULL, NULL, NULL, NULL, NULL);
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, notificationCallback, (CFStringRef)nsNotificationString, NULL, CFNotificationSuspensionBehaviorCoalesce);
 
-    // respring listener
+    // Respring listener
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)RespringDevice, CFSTR("com.yaypixxo.kage/respring"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 }
