@@ -34,6 +34,7 @@ static BOOL hideNoOlderNotifs;
 //static BOOL hideStatusBarLS;
 static BOOL hideCCGrabber;
 static BOOL noBetaAlert;
+static BOOL tapFolderClose;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSNumber *eEnabled = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
@@ -52,6 +53,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     //NSNumber *eHideStatusBarLS = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideStatusBarLS" inDomain:nsDomainString];
     NSNumber *eHideCCGrabber = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"hideCCGrabber" inDomain:nsDomainString];
     NSNumber *eNoBetaAlert = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"noBetaAlert" inDomain:nsDomainString];
+    NSNumber *eTapFolderClose = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"tapFolderClose" inDomain:nsDomainString];
 
     enabled = (eEnabled) ? [eEnabled boolValue]:NO;
     hideQuickActionsBG = (eHideQuickActionsBG) ? [eHideQuickActionsBG boolValue]:NO;
@@ -69,13 +71,14 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     //hideStatusBarLS = (eHideStatusBarLS) ? [eHideStatusBarLS boolValue]:NO;
     hideCCGrabber = (eHideCCGrabber) ? [eHideCCGrabber boolValue]:NO;
     noBetaAlert = (eNoBetaAlert) ? [eNoBetaAlert boolValue]:NO;
+    tapFolderClose = (eTapFolderClose) ? [eTapFolderClose boolValue]:NO;
 }
 
 // Headers 
 #import <UIKit/UIKit.h>
 
-/*@interface SBFolderView : UIView
-@end*/
+@interface SBFloatyFolderView : UIView
+@end
 
 @interface SBIconView : UIView
 -(void)setLabelHidden:(BOOL)hidden;
@@ -271,35 +274,17 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 %end
 
 // Close folder when tapped inside
-/*%hook SBFloatyFolderScrollView
--(SBFloatyFolderScrollView *)initWithFrame:(CGRect)frame {
-    if (enabled && hideFolderBG) {
-        SBFloatyFolderScrollView *yeet = %orig;
-
-        UITapGestureRecognizer *closeGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeFolder)];
-
-        [yeet addGestureRecognizer:closeGesture];
-
-        return yeet;
-    }
-    else {
-        return %orig;
-    }
+%hook SBFloatyFolderView
+-(void)_tapToCloseGestureRecognizer:(id)arg1 shouldReceiveTouch:(id)arg2 {
+	%orig;
+	if (enabled && tapFolderClose) {
+		return YES;
+	}
+	else {
+		return %orig;
+	}
 }
-
-%new
--(void)closeFolder:(id)sender {
-    UIViewController *parentController = [self _viewControllerForAncestor];
-
-    if ([parentController isKindOfClass:[objc_getClass("SBFolderController") class]]) {
-        SBFolderController *sbfc = (SBFolderController *)parentController;
-
-        if (sbfc && [sbfc.containerView isKindOfClass:[objc_getClass("SBFloatyFolderView") class]]) {
-            [(SBFloatyFolderView *)sbfc.containerView _handleOutsideTap:nil];
-        }
-    }
-}
-%end*/
+%end
 
 // Hide folder dots
 %hook SBIconListPageControl
