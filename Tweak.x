@@ -276,13 +276,13 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 // Close folder when tapped inside
 %hook SBFloatyFolderView
 -(BOOL)_tapToCloseGestureRecognizer:(id)arg1 shouldReceiveTouch:(id)arg2 {
-	%orig;
-	if (enabled && tapFolderClose) {
-		return YES;
-	}
-	else {
-		return %orig;
-	}
+    %orig;
+    if (enabled && tapFolderClose) {
+        return YES;
+    }
+    else {
+        return %orig;
+    }
 }
 %end
 
@@ -303,24 +303,24 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 // iOS 9-10
 %hook SBIconController
 -(void)showDeveloperBuildExpirationAlertIfNecesarryFromLockscreen:(BOOL)arg1 toLauncher:(BOOL)arg2 {
-	if (enabled && noBetaAlert) {
+    if (enabled && noBetaAlert) {
 
-	}
-	else {
-		%orig;
-	}
+    }
+    else {
+        %orig;
+    }
 }
 %end
 
 // iOS 11-13
 %hook SBDeveloperBuildExpirationTrigger
 -(void)showDeveloperBuildExpirationAlertIfNecesarryFromLockscreen:(BOOL)arg1 toLauncher:(BOOL)arg2 {
-	if (enabled && noBetaAlert) {
+    if (enabled && noBetaAlert) {
 
-	}
-	else {
-		%orig;
-	}
+    }
+    else {
+        %orig;
+    }
 }
 %end
 
