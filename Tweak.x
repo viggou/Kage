@@ -275,7 +275,7 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
 
 // Close folder when tapped inside
 %hook SBFloatyFolderView
--(void)_tapToCloseGestureRecognizer:(id)arg1 shouldReceiveTouch:(id)arg2 {
+-(BOOL)_tapToCloseGestureRecognizer:(id)arg1 shouldReceiveTouch:(id)arg2 {
 	%orig;
 	if (enabled && tapFolderClose) {
 		return YES;
